@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    def defaultRegistryUrl = 'localhost:5001'
-    def defaultImageName = 'invite-orch-service'
-    def defaultCredentialsId = 'local-registry-creds'
-
     options {
         timestamps()
         disableConcurrentBuilds()
@@ -51,6 +47,9 @@ pipeline {
         stage('Prepare Metadata') {
             steps {
                 script {
+                    def defaultRegistryUrl = 'localhost:5001'
+                    def defaultImageName = 'invite-orch-service'
+                    def defaultCredentialsId = 'local-registry-creds'
                     def resolvedRegistryUrl = params.REGISTRY_URL?.trim() ? params.REGISTRY_URL.trim() : defaultRegistryUrl
                     def resolvedImageName = params.IMAGE_NAME?.trim() ? params.IMAGE_NAME.trim() : defaultImageName
                     def resolvedCredentialsId = params.REGISTRY_CREDENTIALS_ID?.trim() ? params.REGISTRY_CREDENTIALS_ID.trim() : defaultCredentialsId

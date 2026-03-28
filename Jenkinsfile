@@ -24,13 +24,6 @@ pipeline {
         )
     }
 
-    environment {
-        LOCAL_IMAGE = ''
-        REMOTE_IMAGE = ''
-        IMAGE_TAG = ''
-        GIT_SHORT_SHA = ''
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -57,17 +50,21 @@ pipeline {
                         script: 'git rev-parse --short=7 HEAD',
                         returnStdout: true
                     ).trim()
+                    def imageTag = "build-${env.BUILD_NUMBER}-${shortSha}"
+                    def localImage = "${resolvedImageName}:${imageTag}"
+                    def remoteImage = "${resolvedRegistryUrl}/${resolvedImageName}:${imageTag}"
 
                     env.REGISTRY_URL = resolvedRegistryUrl
                     env.IMAGE_NAME = resolvedImageName
                     env.REGISTRY_CREDENTIALS_ID = resolvedCredentialsId
                     env.GIT_SHORT_SHA = shortSha
-                    env.IMAGE_TAG = "build-${env.BUILD_NUMBER}-${shortSha}"
-                    env.LOCAL_IMAGE = "${resolvedImageName}:${env.IMAGE_TAG}"
-                    env.REMOTE_IMAGE = "${resolvedRegistryUrl}/${resolvedImageName}:${env.IMAGE_TAG}"
+                    env.IMAGE_TAG = imageTag
+                    env.LOCAL_IMAGE = localImage
+                    env.REMOTE_IMAGE = remoteImage
 
                     echo "Resolved REGISTRY_URL=${env.REGISTRY_URL}"
                     echo "Resolved IMAGE_NAME=${env.IMAGE_NAME}"
+                    echo "Resolved IMAGE_TAG=${env.IMAGE_TAG}"
                     echo "Resolved LOCAL_IMAGE=${env.LOCAL_IMAGE}"
                     echo "Resolved REMOTE_IMAGE=${env.REMOTE_IMAGE}"
                 }

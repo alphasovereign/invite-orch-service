@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    def defaultRegistryUrl = 'localhost:5001'
+    def defaultImageName = 'invite-orch-service'
+    def defaultCredentialsId = 'local-registry-creds'
+
     options {
         timestamps()
         disableConcurrentBuilds()
@@ -47,13 +51,26 @@ pipeline {
         stage('Prepare Metadata') {
             steps {
                 script {
-                    env.GIT_SHORT_SHA = sh(
+                    def resolvedRegistryUrl = params.REGISTRY_URL?.trim() ? params.REGISTRY_URL.trim() : defaultRegistryUrl
+                    def resolvedImageName = params.IMAGE_NAME?.trim() ? params.IMAGE_NAME.trim() : defaultImageName
+                    def resolvedCredentialsId = params.REGISTRY_CREDENTIALS_ID?.trim() ? params.REGISTRY_CREDENTIALS_ID.trim() : defaultCredentialsId
+                    def shortSha = sh(
                         script: 'git rev-parse --short=7 HEAD',
                         returnStdout: true
                     ).trim()
-                    env.IMAGE_TAG = "build-${env.BUILD_NUMBER}-${env.GIT_SHORT_SHA}"
-                    env.LOCAL_IMAGE = "${params.IMAGE_NAME}:${env.IMAGE_TAG}"
-                    env.REMOTE_IMAGE = "${params.REGISTRY_URL}/${params.IMAGE_NAME}:${env.IMAGE_TAG}"
+
+                    env.REGISTRY_URL = resolvedRegistryUrl
+                    env.IMAGE_NAME = resolvedImageName
+                    env.REGISTRY_CREDENTIALS_ID = resolvedCredentialsId
+                    env.GIT_SHORT_SHA = shortSha
+                    env.IMAGE_TAG = "build-${env.BUILD_NUMBER}-${shortSha}"
+                    env.LOCAL_IMAGE = "${resolvedImageName}:${env.IMAGE_TAG}"
+                    env.REMOTE_IMAGE = "${resolvedRegistryUrl}/${resolvedImageName}:${env.IMAGE_TAG}"
+
+                    echo "Resolved REGISTRY_URL=${env.REGISTRY_URL}"
+                    echo "Resolved IMAGE_NAME=${env.IMAGE_NAME}"
+                    echo "Resolved LOCAL_IMAGE=${env.LOCAL_IMAGE}"
+                    echo "Resolved REMOTE_IMAGE=${env.REMOTE_IMAGE}"
                 }
             }
         }
@@ -68,7 +85,7 @@ pipeline {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: params.REGISTRY_CREDENTIALS_ID,
+                        credentialsId: env.REGISTRY_CREDENTIALS_ID,
                         usernameVariable: 'REGISTRY_USERNAME',
                         passwordVariable: 'REGISTRY_PASSWORD'
                     )

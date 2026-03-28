@@ -165,3 +165,23 @@ After the manual job works, convert the exact same flow into a committed `Jenkin
 5. image push
 
 That gives you the learning benefit of manual setup first, then the maintainability of pipeline-as-code.
+
+This repo now includes that file at the backend root:
+
+- `Jenkinsfile`
+
+Create a Jenkins `Pipeline` job with:
+
+- `Pipeline script from SCM`
+- Git repo: `https://github.com/alphasovereign/invite-orch-service.git`
+- script path: `Jenkinsfile`
+
+Create a Jenkins username/password credential with this default ID:
+
+- `local-registry-creds`
+
+The committed pipeline defaults to:
+
+- `REGISTRY_URL=localhost:5001`
+- `IMAGE_NAME=invite-orch-service`
+- `REGISTRY_CREDENTIALS_ID=local-registry-creds`

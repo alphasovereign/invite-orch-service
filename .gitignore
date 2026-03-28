@@ -1,7 +1,10 @@
 .DS_Store
 .gradle/
 build/
+**/build/
 .idea/
 *.iml
 out/
 .git/
+githubssh
+githubssh.pub

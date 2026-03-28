@@ -109,3 +109,63 @@ That guide covers:
 - running `./gradlew test`
 - building the backend image
 - preparing for Artifactory push
+
+## Jenkins Pipeline-As-Code
+
+This repo now includes a backend-root `Jenkinsfile` that mirrors the proven manual flow:
+
+- checkout
+- test
+- image build
+- registry login
+- image tag
+- image push
+
+### Default Pipeline Target
+
+The pipeline defaults to the local authenticated registry used during learning:
+
+- registry: `localhost:5001`
+- image: `localhost:5001/invite-orch-service:<build-tag>`
+
+### Jenkins Job Setup
+
+Create a new Jenkins job using:
+
+- type: `Pipeline`
+- definition: `Pipeline script from SCM`
+- SCM: `Git`
+- repository URL: `https://github.com/alphasovereign/invite-orch-service.git`
+- script path: `Jenkinsfile`
+
+Create a Jenkins username/password credential for the local registry and give it this ID:
+
+- `local-registry-creds`
+
+The default pipeline parameters are:
+
+- `REGISTRY_URL=localhost:5001`
+- `IMAGE_NAME=invite-orch-service`
+- `REGISTRY_CREDENTIALS_ID=local-registry-creds`
+
+### Build Tag Strategy
+
+The pipeline tags the image with:
+
+- `build-<BUILD_NUMBER>-<short-git-sha>`
+
+Example:
+
+- `localhost:5001/invite-orch-service:build-12-a1b2c3d`
+
+### Later Move To AWS ECR
+
+When you move to ECR, keep the test and Docker build stages unchanged.
+
+Only change:
+
+- `REGISTRY_URL`
+- `REGISTRY_CREDENTIALS_ID`
+- the registry login step in `Jenkinsfile`
+
+The current `docker login` uses username/password for the local registry. ECR should later switch to an AWS-authenticated login command.

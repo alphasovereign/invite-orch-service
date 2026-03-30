@@ -142,11 +142,25 @@ Create a Jenkins username/password credential for the local registry and give it
 
 - `local-registry-creds`
 
+Create a Jenkins username/password credential for AWS ECR and give it this ID:
+
+- `aws-ecr-creds`
+
+For `aws-ecr-creds`:
+
+- username = AWS access key ID
+- password = AWS secret access key
+
 The default pipeline parameters are:
 
+- `TARGET_REGISTRY=local`
 - `REGISTRY_URL=localhost:5001`
 - `IMAGE_NAME=invite-orch-service`
 - `REGISTRY_CREDENTIALS_ID=local-registry-creds`
+- `AWS_REGION=us-east-1`
+- `AWS_CREDENTIALS_ID=aws-ecr-creds`
+- `ECR_REGISTRY=586631184178.dkr.ecr.us-east-1.amazonaws.com`
+- `ECR_REPOSITORY=invite/artifactory`
 
 ### Build Tag Strategy
 
@@ -160,12 +174,21 @@ Example:
 
 ### Later Move To AWS ECR
 
-When you move to ECR, keep the test and Docker build stages unchanged.
+The pipeline now supports both:
 
-Only change:
+- local registry pushes
+- AWS ECR pushes
 
-- `REGISTRY_URL`
-- `REGISTRY_CREDENTIALS_ID`
-- the registry login step in `Jenkinsfile`
+For the first ECR validation run, trigger the pipeline with:
 
-The current `docker login` uses username/password for the local registry. ECR should later switch to an AWS-authenticated login command.
+- `TARGET_REGISTRY=ecr`
+
+That pushes to:
+
+- `586631184178.dkr.ecr.us-east-1.amazonaws.com/invite/artifactory:<build-tag>`
+
+The ECR login flow uses:
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login 586631184178.dkr.ecr.us-east-1.amazonaws.com --username AWS --password-stdin
+```

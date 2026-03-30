@@ -182,6 +182,11 @@ Create a Jenkins username/password credential with this default ID:
 
 The committed pipeline defaults to:
 
+- `TARGET_REGISTRY=local`
 - `REGISTRY_URL=localhost:5001`
 - `IMAGE_NAME=invite-orch-service`
 - `REGISTRY_CREDENTIALS_ID=local-registry-creds`
+- `AWS_REGION=us-east-1`
+- `AWS_CREDENTIALS_ID=aws-ecr-creds`
+- `ECR_REGISTRY=586631184178.dkr.ecr.us-east-1.amazonaws.com`
+- `ECR_REPOSITORY=invite/artifactory`

@@ -159,8 +159,8 @@ The default pipeline parameters are:
 - `REGISTRY_CREDENTIALS_ID=local-registry-creds`
 - `AWS_REGION=us-east-1`
 - `AWS_CREDENTIALS_ID=aws-ecr-creds`
-- `ECR_REGISTRY=586631184178.dkr.ecr.us-east-1.amazonaws.com`
-- `ECR_REPOSITORY=invite/artifactory`
+- `ECR_REGISTRY=<your-account>.dkr.ecr.us-east-1.amazonaws.com`
+- `ECR_REPOSITORY=<your-ecr-repository>`
 
 ### Build Tag Strategy
 
@@ -185,10 +185,16 @@ For the first ECR validation run, trigger the pipeline with:
 
 That pushes to:
 
-- `586631184178.dkr.ecr.us-east-1.amazonaws.com/invite/artifactory:<build-tag>`
+- `<your-account>.dkr.ecr.us-east-1.amazonaws.com/<your-ecr-repository>:<build-tag>`
 
 The ECR login flow uses:
 
 ```bash
-aws ecr get-login-password --region us-east-1 | docker login 586631184178.dkr.ecr.us-east-1.amazonaws.com --username AWS --password-stdin
+aws ecr get-login-password --region us-east-1 | docker login <your-account>.dkr.ecr.us-east-1.amazonaws.com --username AWS --password-stdin
 ```
+
+## AWS Smoke Test Notes
+
+For the minimal-cost ECS Fargate smoke-test deployment and the failures/fixes encountered during setup, see:
+
+`docs/aws-ecs-fargate-smoke-test.md`
